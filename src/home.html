@@ -1,22 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="stylesheet" href="../styling/main.css">
-        <title>Home</title>
-    </head>
-
-    <body>
-        <h1 class="text-center text-5xl mt-16">Audio Player</h1>
-        <div id="js-track-playing" class="flex flex-row min-h-screen justify-center items-center"></div>
-        <div class="visibility: hidden">
-            <input id="js-file-input" type="file" accept="audio/*">
-        </div>
-        <div class="absolute top-2/3" style="left: 47%">
-            <button id="js-download-button" class="bg-black text-white p-2 mt-20">Download File</button>
-        </div>
-    </body>
-
-    <script src="./scripts/home.js" type="module"></script>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../styling/main.css">
+    <title>Home</title>
+</head>
+<body class="relative min-h-screen flex flex-col justify-center items-center">
+    <h1 class="text-center text-5xl pt-18 mb-12">Audio Player</h1>
+    <div class="hidden">
+        <input id="js-file-input" type="file" accept="audio/*">
+    </div>
+    <div id="js-track-playing" class="flex flex-row justify-center items-center"></div>
+    <div class="flex flex-row justify-center items-center mb-28">
+        <button id="js-download-button" class="bg-black text-white p-3 rounded-lg">Download Song</button>
+    </div>
+    <div class="absolute bottom-20 flex justify-center space-x-4 pb-20">
+        <button id="js-home-button" class="bg-gray-100 text-black px-4 py-2 rounded">
+            <img src="../images/home-icon.png" class="w-8 h-8 object-cover">
+        </button>
+        <button id="js-library-button" class="bg-gray-100 text-black px-4 py-2 rounded">
+            <a href="./library.html" target="_blank">
+                <img src="../images/library2-icon.png" class="w-8 h-8 object-cover">
+            </a>
+        </button>
+    </div>
+</body>
+<script src="./scripts/home.js" type="module"></script>
 </html>

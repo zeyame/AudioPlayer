@@ -26,6 +26,14 @@ function handleFileSelection() {
             if (!isFileInDownloads(selectedFile)) {
                 addFileToDownloads(selectedFile);       // adds file and saves to local storage
             }
+            playAudioFile(selectedFile);
         }
     });
+}
+
+function handleLibraryButton() {
+    const libraryBtn = document.getElementById('js-library-button');
+    libraryBtn.addEventListener('click', () => {
+        
+    })
 }
