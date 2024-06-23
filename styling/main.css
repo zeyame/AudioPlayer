@@ -554,16 +554,41 @@ video {
   --tw-contain-style:  ;
 }
 
-.bg-yellow-500 {
+.absolute {
+  position: absolute;
+}
+
+.top-2\/3 {
+  top: 66.666667%;
+}
+
+.mt-16 {
+  margin-top: 4rem;
+}
+
+.hidden {
+  display: none;
+}
+
+.bg-black {
   --tw-bg-opacity: 1;
-  background-color: rgb(234 179 8 / var(--tw-bg-opacity));
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+
+.p-2 {
+  padding: 0.5rem;
 }
 
 .text-center {
   text-align: center;
 }
 
-.text-black {
+.text-5xl {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.text-white {
   --tw-text-opacity: 1;
-  color: rgb(0 0 0 / var(--tw-text-opacity));
+  color: rgb(255 255 255 / var(--tw-text-opacity));
 }
