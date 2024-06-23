@@ -1,4 +1,4 @@
-import { downloads, isFileInDownloads, addFileToDownloads } from "../../data/downloads.js";
+import { downloads, addFileToDownloads } from "../../data/downloads.js";
 import { playAudioFile } from "./fileHandling.js";
 
 handleDownloadButton();
@@ -23,10 +23,8 @@ function handleFileSelection() {
         if (event.target.files[0]) {
             // we add the selected file to the downloads array if it is not there already
             const selectedFile = event.target.files[0];
-            if (!isFileInDownloads(selectedFile)) {
-                addFileToDownloads(selectedFile);       // adds file and saves to local storage
-            }
-            playAudioFile(selectedFile);
+            addFileToDownloads(selectedFile);       // adds file and saves to local storage
+            console.log(downloads);
         }
     });
 }
