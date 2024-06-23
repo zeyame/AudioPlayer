@@ -1,8 +1,10 @@
-import { downloads } from "../../data/downloads.js";
+import { downloads, isFileInDownloads, addFileToDownloads } from "../../data/downloads.js";
+import { playAudioFile } from "./fileHandling.js";
 
 handleDownloadButton();
 handleFileSelection();
 
+// Method handles the click on the download button
 function handleDownloadButton() {
     const downloadButton = document.getElementById('js-download-button');
     downloadButton.addEventListener('click', () => {
@@ -12,25 +14,18 @@ function handleDownloadButton() {
     });
 }
 
+// Method handles the change in value of the input file element
 function handleFileSelection() {
+    // retrieving the selected file
     const fileInput = document.getElementById('js-file-input');
     fileInput.addEventListener('change', (event) => {
         // we check the files property of the input element
         if (event.target.files[0]) {
-            // we add the selected file to the downloads array
+            // we add the selected file to the downloads array if it is not there already
             const selectedFile = event.target.files[0];
-            addFileToDownloads(selectedFile);
-            localStorage.setItem('downloads', JSON.stringify(downloads));
+            if (!isFileInDownloads(selectedFile)) {
+                addFileToDownloads(selectedFile);       // adds file and saves to local storage
+            }
         }
-        console.log(downloads);
-    });
-}
-
-function addFileToDownloads(file) {
-    // Adds metada of the file object to the downloads 
-    downloads.push({
-        name: file.name,
-        type: file.type,
-        size: file.size
     });
 }
