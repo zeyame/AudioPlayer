@@ -16,9 +16,21 @@ function handleFileSelection() {
     const fileInput = document.getElementById('js-file-input');
     fileInput.addEventListener('change', (event) => {
         // we check the files property of the input element
-        if (event.target.files) {
+        if (event.target.files[0]) {
             // we add the selected file to the downloads array
-            downloads.push(event.target.files[0]);
+            const selectedFile = event.target.files[0];
+            addFileToDownloads(selectedFile);
+            localStorage.setItem('downloads', JSON.stringify(downloads));
         }
+        console.log(downloads);
+    });
+}
+
+function addFileToDownloads(file) {
+    // Adds metada of the file object to the downloads 
+    downloads.push({
+        name: file.name,
+        type: file.type,
+        size: file.size
     });
 }
