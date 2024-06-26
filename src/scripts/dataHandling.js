@@ -49,8 +49,9 @@ function insertDownloads(db) {
     const transaction = db.transaction('songs', 'readwrite');
     const store = transaction.objectStore('songs');
 
+    // inserting each song in downloads to the database
     downloads.forEach((song) => {
-        const query = store.get(song.id);
+        const query = store.get(song.id);       // fetches song row
         query.onerror = (event) => {
             console.log(`Failed to get song with id ${song.id} when inserting songs into downloads.`);
             console.error(event.target.error);
@@ -59,7 +60,7 @@ function insertDownloads(db) {
         // if query runs successfully, we check if the song was not already there
         query.onsuccess = (event) => {
             if (!event.target.result) {
-                store.put({id: song.id, name: song.title, playlist: 'downloads', file: song.file});
+                store.put({id: song.id, name: song.title, playlist: 'downloads', file: song.file});         // we store new song to SongsDB
             }
         }
     });
@@ -69,27 +70,29 @@ function insertDownloads(db) {
     }
 
     transaction.oncomplete = () => {
-        console.log('New song successfully loaded into SongsDB');
-        printDatabase(db);
+        if (downloads) console.log('New song successfully loaded into SongsDB');  
+        // printDatabase(db);
     }
 }
 
-function printDatabase(db) {
-    const transaction = db.transaction('songs', 'readonly');
-    const store = transaction.objectStore('songs');
+// printing the database after every insertion
+// function printDatabase(db) {
+//     const transaction = db.transaction('songs', 'readonly');
+//     const store = transaction.objectStore('songs');
 
-    const queryAll = store.getAll();
+//     const queryAll = store.getAll();
 
-    queryAll.onerror = (event) => {
-        console.log("Error in querying the entire SongsDB", event.target.error);
-    }
+//     queryAll.onerror = (event) => {
+//         console.log("Error in querying the entire SongsDB", event.target.error);
+//     }
 
-    queryAll.onsuccess = (event) => {
-        console.log('All the songs in the database:', event.target.result);
-    }
-}
+//     queryAll.onsuccess = (event) => {
+//         console.log('All the songs in the database:', event.target.result);
+//     }
+// }
 
 
+// function fetches the file of a specific song stored in the database
 export async function getSongFileDB(songId) {
 
     return new Promise((resolve, reject) => {
@@ -106,7 +109,7 @@ export async function getSongFileDB(songId) {
             const transaction = db.transaction('songs', 'readonly');
             const store = transaction.objectStore('songs');
 
-            const songQuery = store.get(songId);
+            const songQuery = store.get(songId);        // gets the row for a song with the given id
 
             songQuery.onerror = () => {
                 reject(new Error("Could not query the database for song with id", songId,));
@@ -115,10 +118,10 @@ export async function getSongFileDB(songId) {
             songQuery.onsuccess = (event) => {
                 const song = event.target.result;
                 if (song) {
-                    resolve(song.file);
+                    resolve(song.file);     // if song was found in SongsDB, we resolve the promise with a return value of the file
                 }
                 else {
-                    resolve(null);
+                    resolve(null);          // We resolve with a null value if song was not found in the DB
                 }
             }
         }

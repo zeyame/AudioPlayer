@@ -1,5 +1,6 @@
 import { downloads } from "./downloads.js";
 
+// unique id for every playlist added
 let playlist_id = JSON.parse(localStorage.getItem('playlist_id')) || 1;
 
 export const playlists = JSON.parse(localStorage.getItem('playlists')) || [
@@ -9,9 +10,3 @@ export const playlists = JSON.parse(localStorage.getItem('playlists')) || [
         songs: downloads        // array of songs
     }
 ];
-
-function nextId() {
-    playlist_id++;
-    localStorage.setItem('playlist_id', playlist_id);
-    return playlist_id;
-}

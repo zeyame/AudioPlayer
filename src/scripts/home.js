@@ -1,13 +1,13 @@
 import { downloads, addFileToDownloads } from "../../data/downloads.js";
-import { updateDatabase } from "./dataHandling.js";
+// import { updateDatabase } from "./dataHandling.js";
 
-updateDatabase();
-console.log(downloads);
+// updateDatabase();
+// console.log(downloads);
 handleDownloadButton();
 handleFileSelection();
 
 
-// Method handles the click on the download button
+// function handles the click on the download button
 function handleDownloadButton() {
     const downloadButton = document.getElementById('js-download-button');
     downloadButton.addEventListener('click', () => {
@@ -17,24 +17,16 @@ function handleDownloadButton() {
     });
 }
 
-// Method handles the change in value of the input file element
+// function handles the change in value of the input file element
 function handleFileSelection() {
     // retrieving the selected file
     const fileInput = document.getElementById('js-file-input');
     fileInput.addEventListener('change', (event) => {
         // we check the files property of the input element
         if (event.target.files[0]) {
-            // we add the selected file to the downloads array if it is not there already
             const selectedFile = event.target.files[0];
-            addFileToDownloads(selectedFile);       // adds file and saves to local storage
-            console.log(downloads);
+            addFileToDownloads(selectedFile);       // adds the new file to downloads, saves to storage, updates database
+            // console.log(downloads);
         }
     });
-}
-
-function handleLibraryButton() {
-    const libraryBtn = document.getElementById('js-library-button');
-    libraryBtn.addEventListener('click', () => {
-        
-    })
 }
