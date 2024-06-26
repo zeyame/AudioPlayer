@@ -1,17 +1,15 @@
-import { downloads } from "../../data/downloads.js";
 import { playlists } from "../../data/playlists.js";
 import { getSongFileDB } from "./dataHandling.js";
 import { renderURL } from "../../data/downloads.js";
 
 // method renders songs on the screen when a playlist is clicked
 export function renderSongs() {
-    const playlistsContainer = document.getElementById('js-playlists-container');
     const playlistButtons = document.querySelectorAll('.js-playlist-button');       // all playlists on the screen
 
     playlistButtons.forEach((button) => {
         button.addEventListener('click', async () => {
             const buttonId = button.id;
-            playlistsContainer.innerHTML = await displaySongs(buttonId);        // displays the songs of the clicked playlist
+            document.body.innerHTML = await displaySongs(buttonId);        // displays the songs of the clicked playlist
             // console.log(downloads);
         });
     });
@@ -33,15 +31,24 @@ async function displaySongs(buttonId) {
         return songsHTML;
     }
 
-    songsHTML += `<h1 class="text-center">${playlist.name}</div>`;
+    songsHTML += `
+        <header class="w-full bg-white py-4 shadow-md">
+            <h1 class="text-center text-xl font-bold">${playlist.name}</h1>
+        </header>`;
 
     // try-catch block used as processSongs may throw an unexpected error
     try {
         await processSongs(playlist);       // Wait for the songs in clicked playlist to be processed (new blob urls generated)
         playlist.songs.forEach((song) => {
             songsHTML += `
-                <div>
-                    <audio controls src=${song.url}>${song.title}</audio>
+                <div class="flex items-center w-full">
+                    <audio controls class="w-1/2 bg-gray-200 rounded-lg p-2">
+                        <source src="${song.url}" type="audio/mp3">
+                    </audio>
+                    <div class="ml-4">
+                        <p class="text-lg font-semibold">${song.title}</p>
+                        <p class="text-gray-500">${song.duration}</p>
+                    </div>
                 </div>
             `;
         });
@@ -54,7 +61,7 @@ async function displaySongs(buttonId) {
     return songsHTML;
 }
 
-// function generates new URLs for song files in a playlist
+// function generates duration and new URLs for song files in a playlist
 // function is async as await needs to be used for getSongFileDB which returns a promise
 async function processSongs(playlist) {
     for (const song of playlist.songs) {
@@ -67,6 +74,7 @@ async function processSongs(playlist) {
             if (songFile) {
                 const url = renderURL(songFile);
                 song.url = url;
+                song.duration = '2:30';
             }
             else {
                 console.log("File for song with id", song.id, "could not be found in the database.");
