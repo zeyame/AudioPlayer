@@ -1,37 +1,32 @@
+import { updateDatabase } from "../src/scripts/dataHandling.js";
+
 let running_id = JSON.parse(localStorage.getItem('running_id')) || 1;
 
 export const downloads = JSON.parse(localStorage.getItem('downloads')) || [];
 
 export function isFileInDownloads(file) {
-    for (const existingFile of downloads) {
-        if (existingFile.title === file.name) return true;
-    }
-    return false;
+    return downloads.some(existingFile => existingFile.name === file.name);
 }
 
 
 export function addFileToDownloads(file) {
     // Adds metada of the file object to the downloads 
-    console.log(isFileInDownloads(file));
     if (!isFileInDownloads(file)) {
-        downloads.push({
+        downloads.push(
+            {
             id: running_id,
+            playlist_id: downloads.id,
             title: file.name,
-            type: file.type,
-            size: file.size,
-            url: getURL(file)
+            file: file
         });
-        saveToStorage();
         running_id += 1;
         localStorage.setItem('running_id', JSON.stringify(running_id));
+        updateDatabase();
     }
 }
 
-export function saveToStorage() {
-    localStorage.setItem('downloads', JSON.stringify(downloads));
-}
 
-function getURL(file) {
+export function renderURL(file) {
     const blobUrl = URL.createObjectURL(file);
     return blobUrl;
 }

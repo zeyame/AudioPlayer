@@ -1,8 +1,9 @@
 import { downloads, addFileToDownloads } from "../../data/downloads.js";
-import { playAudioFile } from "./fileHandling.js";
 
+console.log(downloads);
 handleDownloadButton();
 handleFileSelection();
+
 
 // Method handles the click on the download button
 function handleDownloadButton() {
