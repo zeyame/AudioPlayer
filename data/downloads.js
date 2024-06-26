@@ -1,12 +1,12 @@
 import { updateDatabase } from "../src/scripts/dataHandling.js";
-
+import { displayDownloadMessage, hideDownloadMessage } from "../src/scripts/home.js";
 // unique id for every song in the downloads array
 let running_id = JSON.parse(localStorage.getItem('running_id')) || 1;
 
 export const downloads = JSON.parse(localStorage.getItem('downloads')) || [];
 
 function isFileInDownloads(file) {
-    return downloads.some(existingFile => existingFile.name === file.name);     // returns true if file already exists
+    return downloads.some(existingFile => existingFile.title === file.name);     // returns true if file already exists
 }
 
 
@@ -23,8 +23,18 @@ export function addFileToDownloads(file) {
         });
         saveToStorage();
         updateDatabase();
+        displayDownloadMessage(file.name, true);
+        setTimeout(() => {
+            hideDownloadMessage();
+        }, 3000);
         running_id += 1;
         localStorage.setItem('running_id', JSON.stringify(running_id));
+    }
+    else {
+        displayDownloadMessage(file.name, false);
+        setTimeout(() => {
+            hideDownloadMessage();
+        }, 3000);
     }
 }
 
