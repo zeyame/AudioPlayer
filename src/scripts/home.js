@@ -1,5 +1,7 @@
 import { downloads, addFileToDownloads } from "../../data/downloads.js";
+import { updateDatabase } from "./dataHandling.js";
 
+updateDatabase();
 console.log(downloads);
 handleDownloadButton();
 handleFileSelection();

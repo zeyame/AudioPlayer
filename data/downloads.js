@@ -19,10 +19,15 @@ export function addFileToDownloads(file) {
             title: file.name,
             file: file
         });
+        saveToStorage();
+        updateDatabase();
         running_id += 1;
         localStorage.setItem('running_id', JSON.stringify(running_id));
-        updateDatabase();
     }
+}
+
+function saveToStorage() {
+    localStorage.setItem('downloads', JSON.stringify(downloads));
 }
 
 
