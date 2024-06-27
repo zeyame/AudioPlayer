@@ -2,7 +2,7 @@ import { downloads, addFileToDownloads } from "../../data/downloads.js";
 // import { updateDatabase } from "./dataHandling.js";
 
 // updateDatabase();
-// console.log(downloads);
+
 
 // function handles the click on the download button
 function handleDownloadButton() {
@@ -47,4 +47,5 @@ export function hideDownloadMessage() {
 document.addEventListener('DOMContentLoaded', () => {
     handleFileSelection();
     handleDownloadButton();
-})
+});
+

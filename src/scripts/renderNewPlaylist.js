@@ -1,4 +1,5 @@
-import { playlists } from "../../data/playlists.js";
+import { addPlaylist, getPlaylist } from "../../data/playlists.js";
+import { renderPlaylists } from "./renderPlaylists.js";
 
 export function renderNewPlaylist() {
 
@@ -14,29 +15,28 @@ export function renderNewPlaylist() {
                 </button>
                 <h2 class="text-xl font-bold mb-4">Create New Playlist</h2>
                 <input id="js-enter-playlist-name" type="text" placeholder="Enter playlist name" class="w-full px-3 py-2 border rounded mb-4">
+                <p id="js-empty-input-message" class="text-sm text-red-700 mt-0 mb-3"></p>
+                <p id="js-playlist-name-taken" class="text-sm text-red-700 mt-0 mb-3"></p>
                 <button id="js-add-new-playlist-button" class="bg-black text-white px-4 py-2 rounded">
                     Add Playlist
                 </button>
             </div>
         </div>`;
 
-        // making the modal visible
+        // making the modal visible upon click
         newPlaylistModal.classList.remove('hidden');
         newPlaylistModal.classList.add('flex');
 
-        // adding a click listener for the input element 
+        // adding a click listener for the add playlist button 
         document.getElementById('js-add-new-playlist-button').addEventListener('click', () => {
-            // take the value entered and save it in the playlists array
-            // const inputElement = document.getElementById('js-enter-playlist-name');
-            // const playlistName = inputElement.value;
-            // playlists.push({
-            //     id: 
+            handlePlaylistInput();
+        });
 
-            // })
-
-            // make the playlist modal hidden again
-            newPlaylistModal.classList.add('hidden');
-            newPlaylistModal.classList.remove('flex');
+        // adding an 'Enter' button listener to the body
+        document.body.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                handlePlaylistInput();
+            }
         });
 
         // adding a click listener for the exit button
@@ -48,4 +48,38 @@ export function renderNewPlaylist() {
 }
 
 
+function handlePlaylistInput() {
+    // take the value entered and save it in the playlists array
+    const inputElement = document.getElementById('js-enter-playlist-name');
+    const playlistName = inputElement.value;
+    const newPlaylistModal = document.getElementById('js-new-playlist-modal');
 
+    // If user enters a name we check if it is taken or not
+    if (playlistName) {
+        const playlistExists = getPlaylist(playlistName);
+
+        // if name is not taken we add playlist
+        if (!playlistExists) {
+            addPlaylist(playlistName, []);          // add playlist with name and empty songs array
+            
+            // make the playlist modal hidden again
+            newPlaylistModal.classList.add('hidden');
+            newPlaylistModal.classList.remove('flex');
+
+            // we diplay new playlist list
+            renderPlaylists();
+        }
+
+        else {
+            const nameTakenElement = document.getElementById('js-playlist-name-taken');
+            nameTakenElement.innerText = `${playlistName} is already taken`;
+        }
+
+    }
+
+    // If user leaves input empty and clicks add button we display warning message
+    else {
+        const emptyInputMessage = document.getElementById('js-empty-input-message');
+        emptyInputMessage.innerText = "Cannot add playlist with no name.";
+    }
+}
