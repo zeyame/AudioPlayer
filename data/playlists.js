@@ -10,3 +10,8 @@ export const playlists = JSON.parse(localStorage.getItem('playlists')) || [
         songs: downloads        // array of songs
     }
 ];
+
+
+// export function addPlaylist(playlistName) {
+//     playlists.push
+// }

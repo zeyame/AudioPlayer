@@ -1,0 +1,9 @@
+.modal-backdrop {
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 300px;
+    height: 300px;
+}
