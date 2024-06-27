@@ -1,4 +1,4 @@
-import { addPlaylist, getPlaylist } from "../../data/playlists.js";
+import { addPlaylist, isPlaylist } from "../../data/playlists.js";
 import { renderPlaylists } from "./renderPlaylists.js";
 
 export function renderNewPlaylist() {
@@ -56,7 +56,7 @@ function handlePlaylistInput() {
 
     // If user enters a name we check if it is taken or not
     if (playlistName) {
-        const playlistExists = getPlaylist(playlistName);
+        const playlistExists = isPlaylist(playlistName);
 
         // if name is not taken we add playlist
         if (!playlistExists) {

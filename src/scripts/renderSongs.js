@@ -1,6 +1,6 @@
 import { playlists } from "../../data/playlists.js";
 import { getSongFileDB } from "./dataHandling.js";
-import { renderURL } from "../../data/downloads.js";
+import { downloads, renderURL } from "../../data/downloads.js";
 import { renderPlaylists } from "./renderPlaylists.js";
 
 // method renders songs on the screen when a playlist is clicked
@@ -11,6 +11,7 @@ export function renderSongs() {
         button.addEventListener('click', async () => {
             const buttonId = button.id;
             document.body.innerHTML = await displaySongs(buttonId);        // displays the songs of the clicked playlist
+            handleAddSongBtn();
             // console.log(downloads);
         });
     });
@@ -38,7 +39,11 @@ async function displaySongs(buttonId) {
             <button id="js-exit-current-playlist" class="absolute top-4 right-6 text-lg font-bold text-gray-500 hover:text-gray-900">
                 <a href="library.html">X</a>
             </button>
-        </header>`;
+        </header>
+        <div id="js-add-songs-modal" class="fixed inset-0 hidden z-50 overflow-auto modal-backdrop"></div>
+        <div class="flex flex-row justify-center items-center mb-24">
+            <button id="js-add-song-button" class="bg-black text-white px-3 py-2 rounded-lg">Add Song</button>
+        </div>`;
     
     // try-catch block used as processSongs may throw an unexpected error
     try {
@@ -88,4 +93,66 @@ async function processSongs(playlist) {
             console.log("Error fetching song with id", song.id, "when processing the songs in playlist", playlist.name, error);
         }
     };
+}
+
+
+function handleAddSongBtn() {
+    const addSongBtn = document.getElementById('js-add-song-button');
+    const addSongsModal = document.getElementById('js-add-songs-modal');
+
+    // console.log(addSongBtn);
+    // console.log(addSongsModal);
+
+    addSongBtn.addEventListener('click', () => {
+        // console.log('hello');
+        addSongsModal.innerHTML = `
+            <div class="modal-content relative p-8 bg-white m-auto flex-col flex rounded-lg">
+                <div id="js-add-songs-popup" class="flex flex-col items-center justify-center h-full">
+                    <button id="js-exit-add-songs-popup" class="absolute top-6 right-8 text-gray-500 hover:text-gray-900">
+                        <span class="font-bold text-lg">X</span>
+                    </button>
+                    <h2 class="text-xl font-bold mb-4">Add Song</h2>
+                    <select name="songs" id="js-add-songs-selection>
+                        <option value="Zeyad">Zeyad</option>
+                    </select>
+                    <button id="js-add-new-song-button" class="bg-black text-white px-4 py-2 rounded">
+                        Add Song
+                    </button>
+                </div>
+            </div>
+        `;
+
+        // adds click event listeners to the exit and add new song buttons
+        handlePopUpButtons();
+
+        addSongsModal.classList.remove('hidden');
+        addSongsModal.classList.add('flex');
+    });
+}
+
+function generateDownloadedSongs() {
+    let html = '';
+    downloads.forEach((song) => {
+        html += `
+        <option value="${song.name}">${song.name}</option>
+        `;
+    });
+
+    return html;
+}
+
+function handlePopUpButtons() {
+    const addSongsModal = document.getElementById('js-add-songs-modal');
+    const exitButton = document.getElementById('js-exit-add-songs-popup');
+    const addSongBtn = document.getElementById('js-add-new-song-button');
+
+    exitButton.addEventListener('click', () => {
+        addSongsModal.classList.add('hidden');
+        addSongsModal.classList.remove('flex');
+    });
+
+    addSongBtn.addEventListener('click', () => {
+        addSongsModal.classList.add('hidden');
+        addSongsModal.classList.remove('flex');
+    });
 }

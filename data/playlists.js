@@ -12,8 +12,16 @@ export const playlists = JSON.parse(localStorage.getItem('playlists')) || [
     }
 ];
 
-export function getPlaylist(playlistName) {
+export function isPlaylist(playlistName) {
     return playlists.some(playlist => playlist.name === playlistName);
+}
+
+function getPlaylist(playlistName) {
+    return playlists.find(playlist => playlist.name === playlistName);
+}
+
+function isSongInPlaylist(playlist, songName) {
+    return playlist.songs.some(song => song.name === songName);
 }
 
 export function addPlaylist(playlistName, songsArray) {
@@ -24,6 +32,19 @@ export function addPlaylist(playlistName, songsArray) {
     });
     savePlaylist();
     console.log(playlists);
+}
+
+export function addSong(playlistName, songFile) {
+    const playlist = getPlaylist(playlistName);
+    if (playlist) {
+        // add song to playlist if not already there
+        if (!isSongInPlaylist) {
+            playlist.songs.push({
+                title: songFile.name,
+                file: songFile
+            });
+        }
+    }
 }
 
 function savePlaylist() {
