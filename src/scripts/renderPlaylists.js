@@ -12,7 +12,6 @@ export function renderPlaylists() {
         `
     });
 
-    // console.log(playlistsHTML);
-
+    console.log(playlistsHTML);
     playlistsContainer.innerHTML = playlistsHTML;
 }

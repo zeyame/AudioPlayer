@@ -1,6 +1,7 @@
 import { playlists } from "../../data/playlists.js";
 import { getSongFileDB } from "./dataHandling.js";
 import { renderURL } from "../../data/downloads.js";
+import { renderPlaylists } from "./renderPlaylists.js";
 
 // method renders songs on the screen when a playlist is clicked
 export function renderSongs() {
@@ -34,8 +35,11 @@ async function displaySongs(buttonId) {
     songsHTML += `
         <header class="w-full bg-white py-4 shadow-md">
             <h1 class="text-center text-xl font-bold">${playlist.name}</h1>
+            <button id="js-exit-current-playlist" class="absolute top-4 right-6 text-lg font-bold text-gray-500 hover:text-gray-900">
+                <a href="library.html">X</a>
+            </button>
         </header>`;
-
+    
     // try-catch block used as processSongs may throw an unexpected error
     try {
         await processSongs(playlist);       // Wait for the songs in clicked playlist to be processed (new blob urls generated)
