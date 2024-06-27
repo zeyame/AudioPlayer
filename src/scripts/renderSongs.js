@@ -40,10 +40,17 @@ async function displaySongs(buttonId) {
                 <a href="library.html">X</a>
             </button>
         </header>
-        <div id="js-add-songs-modal" class="fixed inset-0 hidden z-50 overflow-auto modal-backdrop"></div>
-        <div class="flex flex-row justify-center items-center mb-24">
-            <button id="js-add-song-button" class="bg-black text-white px-3 py-2 rounded-lg">Add Song</button>
-        </div>`;
+        <div id="js-add-songs-modal" class="fixed inset-0 hidden z-50 overflow-auto modal-backdrop"></div>`;
+
+    // user will not add songs to downloads
+    // this can be done through the home page
+    if (playlist.name !== 'Downloads') {
+        songsHTML += `
+            <div class="flex flex-row justify-center items-center mb-24">
+                <button id="js-add-song-button" class="bg-black text-white px-3 py-2 rounded-lg">Add Song</button>
+            </div>
+        `;
+    }
     
     // try-catch block used as processSongs may throw an unexpected error
     try {
