@@ -119,15 +119,20 @@ function handleAddSongBtn() {
                         <span class="font-bold text-lg">X</span>
                     </button>
                     <h2 class="text-xl font-bold mb-4">Add Song</h2>
-                    <select name="songs" id="js-add-songs-selection>
-                        <option value="Zeyad">Zeyad</option>
-                    </select>
+                    <div class="song-list-container overflow-y-auto max-h-60 w-full mb-6">
+                        <form id="js-add-songs-form">
+                            <!-- Song list will be populated here -->
+                        </form>
+                    </div>
                     <button id="js-add-new-song-button" class="bg-black text-white px-4 py-2 rounded">
                         Add Song
                     </button>
                 </div>
             </div>
         `;
+
+        // add to the form all the downloaded songs that can be added to playlist
+        populateSongs();
 
         // adds click event listeners to the exit and add new song buttons
         handlePopUpButtons();
@@ -137,15 +142,21 @@ function handleAddSongBtn() {
     });
 }
 
-function generateDownloadedSongs() {
-    let html = '';
-    downloads.forEach((song) => {
-        html += `
-        <option value="${song.name}">${song.name}</option>
-        `;
-    });
+function populateSongs() {
+    // retrieve the form which will contain all downloaded songs
+    const songListForm = document.getElementById('js-add-songs-form');
 
-    return html;
+    // add all the downloaded songs as options to the form
+    downloads.forEach((song) => {
+        // create a container div for every song
+        const songItem = document.createElement('div');
+        songItem.className = 'song-item flex items-center mb-0';
+        songItem.innerHTML = `
+            <input type="checkbox" id="song-${song.id} name="song-${song.id}" value="${song.id}" class="mr-2">
+            <label for="song-${song.id}">${song.title}</label>
+        `;
+        songListForm.appendChild(songItem);
+    });
 }
 
 function handlePopUpButtons() {

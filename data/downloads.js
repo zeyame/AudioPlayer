@@ -1,5 +1,7 @@
 import { updateDatabase } from "../src/scripts/dataHandling.js";
 import { displayDownloadMessage, hideDownloadMessage } from "../src/scripts/home.js";
+// unique id for every song in the downloads array
+let running_id = JSON.parse(localStorage.getItem('running_id')) || 1;
 
 export const downloads = JSON.parse(localStorage.getItem('downloads')) || [];
 
@@ -14,6 +16,7 @@ export function addFileToDownloads(file) {
     if (!isFileInDownloads(file)) {
         downloads.push(
             {
+            id: running_id,
             title: file.name,
             file: file
         });
@@ -23,6 +26,8 @@ export function addFileToDownloads(file) {
         setTimeout(() => {
             hideDownloadMessage();
         }, 3000);
+        running_id += 1;
+        localStorage.setItem('running_id', JSON.stringify(running_id));
     }
     else {
         displayDownloadMessage(file.name, false);
