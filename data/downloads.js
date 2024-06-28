@@ -20,17 +20,21 @@ export function addFileToDownloads(file) {
             title: file.name,
             file: file
         });
-        console.log(downloads);
         saveToStorage();
         updateDatabase();
+
+        // display successful download message for 3 seconds
         displayDownloadMessage(file.name, true);
         setTimeout(() => {
             hideDownloadMessage();
         }, 3000);
+
+        // incrementing running id for the next song added to downloads
         running_id += 1;
         localStorage.setItem('running_id', JSON.stringify(running_id));
     }
     else {
+        // display failed download message for 3 seconds
         displayDownloadMessage(file.name, false);
         setTimeout(() => {
             hideDownloadMessage();

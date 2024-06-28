@@ -91,9 +91,8 @@ async function displaySongs(playlistId) {
 // function generates duration and new URLs for song files in a playlist
 // function is async as await needs to be used for getSongFileDB which returns a promise
 async function processSongs(playlist) {
-    console.log(playlist);
+
     for (const song of playlist.songs) {
-        console.log(song);
         // try-catch is utilized as getSongFileDB may throw unexpected errors when querying the database for the file
         try {
             const songFile = await getSongFileDB(song.id);
@@ -185,12 +184,11 @@ function handlePopUpButtons() {
             const selectedSongs = await getSelectedSongs();
             const playlistName = document.getElementById('js-playlist-name-header').innerText;
             const playlist = getPlaylist(playlistName);
-            console.log("Selected songs right before we add them to the playlist:", selectedSongs);
+
             if (selectedSongs.length > 0) {
                 selectedSongs.forEach((songObject) => {
                     addSong(playlist.name, songObject);
                 });
-                console.log("Songs in", playlistName, ":", playlist.songs);
             }
     
             addSongsModal.classList.add('hidden');
@@ -217,7 +215,6 @@ async function getSelectedSongs() {
             // try-catch needed as getSongFileDB can throw an unexpected error
             try {
                 const songFile = await getSongFileDB(songId);
-                console.log('Song file retrieved:', songFile);
 
                 // if song file is valid, we return an object wrapped in a promise
                 if (songFile) {
