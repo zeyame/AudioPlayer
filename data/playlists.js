@@ -34,15 +34,18 @@ export function addPlaylist(playlistName, songsArray) {
     console.log(playlists);
 }
 
-export function addSong(playlistName, songFile) {
+export function addSong(playlistName, songObject) {
     const playlist = getPlaylist(playlistName);
+
     if (playlist) {
         // add song to playlist if not already there
-        if (!isSongInPlaylist) {
+        if (!isSongInPlaylist(playlist, songObject.name)) {
             playlist.songs.push({
-                title: songFile.name,
-                file: songFile
+                id: songObject.id,
+                title: songObject.title,
+                file: songObject.file
             });
+            savePlaylist();
         }
     }
 }

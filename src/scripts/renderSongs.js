@@ -1,4 +1,4 @@
-import { getPlaylist, playlists } from "../../data/playlists.js";
+import { getPlaylist, playlists, addSong } from "../../data/playlists.js";
 import { getSongFileDB, updateDatabase } from "./dataHandling.js";
 import { downloads, renderURL } from "../../data/downloads.js";
 import { renderPlaylists } from "./renderPlaylists.js";
@@ -91,8 +91,9 @@ async function displaySongs(playlistId) {
 // function generates duration and new URLs for song files in a playlist
 // function is async as await needs to be used for getSongFileDB which returns a promise
 async function processSongs(playlist) {
+    console.log(playlist);
     for (const song of playlist.songs) {
-
+        console.log(song);
         // try-catch is utilized as getSongFileDB may throw unexpected errors when querying the database for the file
         try {
             const songFile = await getSongFileDB(song.id);
@@ -184,13 +185,13 @@ function handlePopUpButtons() {
             const selectedSongs = await getSelectedSongs();
             const playlistName = document.getElementById('js-playlist-name-header').innerText;
             const playlist = getPlaylist(playlistName);
-
+            console.log("Selected songs right before we add them to the playlist:", selectedSongs);
             if (selectedSongs.length > 0) {
                 selectedSongs.forEach((songObject) => {
-                    playlist.songs.push(songObject);
+                    addSong(playlist.name, songObject);
                 });
+                console.log("Songs in", playlistName, ":", playlist.songs);
             }
-            console.log("Playlist after adding selected songs:", playlist.songs);
     
             addSongsModal.classList.add('hidden');
             addSongsModal.classList.remove('flex');
@@ -208,8 +209,6 @@ function handlePopUpButtons() {
 // function has to be async since we need to use await at the end 
 async function getSelectedSongs() {
     const songOptions = document.querySelectorAll('.js-song-option:checked');       // all input elements in the song form
-    // console.log('Selected options:', songOptions.length);
-    // console.log(songOptions);
 
     const selectedPromises = Array.from(songOptions)
         .map(async (songOption) => {
@@ -241,7 +240,7 @@ async function getSelectedSongs() {
         });
 
     const selectedSongs = await Promise.all(selectedPromises);
-    console.log('Selected songs before filtering:', selectedSongs);
+
     // this return value will also be wrapped in a promise since this is an async function
     return selectedSongs.filter(selectedSong => selectedSong !== null);     // extra check for assurance before returning
 }

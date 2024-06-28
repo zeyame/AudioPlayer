@@ -1,5 +1,6 @@
-import { addPlaylist, isPlaylist } from "../../data/playlists.js";
+import { addPlaylist, isPlaylist, playlists } from "../../data/playlists.js";
 import { renderPlaylists } from "./renderPlaylists.js";
+import { renderSongs } from "./renderSongs.js";
 
 export function renderNewPlaylist() {
 
@@ -68,6 +69,8 @@ function handlePlaylistInput() {
 
             // we diplay new playlist list
             renderPlaylists();
+            // We add the click listener for this new playlist
+            renderSongs();
         }
 
         else {

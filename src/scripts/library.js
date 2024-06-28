@@ -1,4 +1,5 @@
 // import { downloads } from "../../data/downloads.js";
+import { playlists } from "../../data/playlists.js";
 import { renderNewPlaylist } from "./renderNewPlaylist.js";
 import { renderPlaylists } from "./renderPlaylists.js";
 import { renderSongs } from "./renderSongs.js";
