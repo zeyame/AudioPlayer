@@ -16,7 +16,7 @@ export function isPlaylist(playlistName) {
     return playlists.some(playlist => playlist.name === playlistName);
 }
 
-function getPlaylist(playlistName) {
+export function getPlaylist(playlistName) {
     return playlists.find(playlist => playlist.name === playlistName);
 }
 

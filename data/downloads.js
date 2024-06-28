@@ -20,6 +20,7 @@ export function addFileToDownloads(file) {
             title: file.name,
             file: file
         });
+        console.log(downloads);
         saveToStorage();
         updateDatabase();
         displayDownloadMessage(file.name, true);
