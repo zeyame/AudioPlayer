@@ -134,6 +134,7 @@ function handleAddSongBtn() {
                     <button id="js-add-new-song-button" class="bg-black text-white px-4 py-2 rounded">
                         Add Song
                     </button>
+                    <p id="js-no-songs-selected" class="text-red-600 mt-3"></p>
                 </div>
             </div>
         `;
@@ -155,7 +156,7 @@ function populateSongs(playlistId) {
     // retrieve the form which will contain all downloaded songs
     const songListForm = document.getElementById('js-add-songs-form');
     const playlist = getPlaylistById(playlistId);
-    
+
     // add all the downloaded songs as options to the form
     downloads.forEach((song) => {
         if (!isSongInPlaylist(playlist, song.title)) {
@@ -194,18 +195,20 @@ function handlePopUpButtons() {
                 selectedSongs.forEach((songObject) => {
                     addSong(playlistName, songObject);
                 });
+                addSongsModal.classList.add('hidden');
+                addSongsModal.classList.remove('flex');
+
+                // render the newly added songs to playlist
+                document.body.innerHTML = await displaySongs(playlist.id);
+
+                // make sure add song button works without having to refresh page 
+                handleAddSongBtn();
             }
-            // console.log('Playlist after selected songs have been added', playlist.songs);
-    
-            addSongsModal.classList.add('hidden');
-            addSongsModal.classList.remove('flex');
 
-            // render the newly added songs to playlist
-            document.body.innerHTML = await displaySongs(playlist.id);
-
-            // make sure add song button works without having to refresh page 
-            handleAddSongBtn();
-
+            else {
+                const noSongsSelectedMsg = document.getElementById('js-no-songs-selected');
+                noSongsSelectedMsg.innerText = 'You have not selected any songs.';
+            }
         }
         catch (error) {
             console.error("Error thrown by getSelectedSongs() when adding the click listener for the add song button.", error);
