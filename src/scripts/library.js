@@ -1,6 +1,6 @@
-import { renderNewPlaylist } from "./renderNewPlaylist.js";
-import { renderPlaylists } from "./renderPlaylists.js";
-import { renderSongs } from "./renderSongs.js";
+import { renderNewPlaylist } from "./rendering/renderNewPlaylist.js";
+import { renderPlaylists } from "./rendering/renderPlaylists.js";
+import { renderSongs } from "./rendering/renderSongs.js";
 
 renderPlaylists();      // displays the playlists created by user when library page loads
 renderSongs();          // adds click listeners for each playlist

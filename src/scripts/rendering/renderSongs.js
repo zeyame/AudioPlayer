@@ -1,5 +1,5 @@
 import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist } from "../../../data/playlists.js";
-import { getSongFileDB, removeSongFromDB, updateDatabase } from "../../../data/database.js";
+import { getSongFileDB, removeSongFromDB } from "../../../data/database.js";
 import { removeSongFromDownloads, renderURL, updateDownloadsPlaylist } from "../../../data/downloads.js";
 import { downloads } from "../../../data/downloadsData.js";
 
@@ -267,7 +267,6 @@ function handleDeleteSongBtn() {
     deleteSongButtons.forEach((deleteSongBtn) => {
         deleteSongBtn.addEventListener('click', async () => {
 
-            console.log('click');
             const songId = Number(deleteSongBtn.dataset.songId);
             const playlistId = Number(deleteSongBtn.dataset.playlistId);
 
@@ -282,9 +281,8 @@ function handleDeleteSongBtn() {
                     // removing the song from the database
                     removeSongFromDB(songId);
 
-
-                    console.log(downloads);
-                    console.log(getPlaylistById(1).songs);
+                    // regenerating html for the updating song list of the playlist
+                    document.body.innerHTML = await displaySongs(playlistId);
                 }
                 catch (error) {
                     console.error("Error unexpectedly thrown when removing song with id", songId, 'from SongsDB', error);
@@ -294,10 +292,15 @@ function handleDeleteSongBtn() {
             else {
                 // remove song from the playlist but do not change the downloads array or SongsDB
                 removeSongFromPlaylist(playlistId, songId);
+
+                // regenerating html for the updating song list of the playlist
+                document.body.innerHTML = await displaySongs(playlistId);
+
+                // adding the event listener for the add song button
+                handleAddSongBtn();
             }
 
-            document.body.innerHTML = await displaySongs(playlistId);
-            handleAddSongBtn();
+            // adding the event listeners for the delete songs button
             handleDeleteSongBtn();
         }
     )});
