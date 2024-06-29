@@ -1,9 +1,11 @@
 import { updateDatabase } from "../src/scripts/dataHandling.js";
 import { displayDownloadMessage, hideDownloadMessage } from "../src/scripts/home.js";
+import { getPlaylistById, savePlaylists } from "./playlists.js";
+import { downloads } from "./downloadsData.js";
+
 // unique id for every song in the downloads array
 let running_id = JSON.parse(localStorage.getItem('running_id')) || 1;
 
-export const downloads = JSON.parse(localStorage.getItem('downloads')) || [];
 
 function isFileInDownloads(file) {
     return downloads.some(existingFile => existingFile.title === file.name);     // returns true if file already exists
@@ -51,4 +53,13 @@ function saveToStorage() {
 export function renderURL(file) {
     const blobUrl = URL.createObjectURL(file);
     return blobUrl;
+}
+
+export function updateDownloadsPlaylist() {
+    const downloadsPlaylist = getPlaylistById(1);
+    
+    if (downloadsPlaylist) {
+        downloadsPlaylist.songs = [...downloads];
+        savePlaylists();
+    }
 }

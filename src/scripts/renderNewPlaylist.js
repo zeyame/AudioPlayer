@@ -1,4 +1,4 @@
-import { addPlaylist, isPlaylist, playlists } from "../../data/playlists.js";
+import { addPlaylist, isPlaylist } from "../../data/playlists.js";
 import { renderPlaylists } from "./renderPlaylists.js";
 import { renderSongs } from "./renderSongs.js";
 

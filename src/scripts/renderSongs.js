@@ -1,7 +1,7 @@
 import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist } from "../../data/playlists.js";
 import { getSongFileDB, updateDatabase } from "./dataHandling.js";
-import { downloads, renderURL } from "../../data/downloads.js";
-import { renderPlaylists } from "./renderPlaylists.js";
+import { renderURL } from "../../data/downloads.js";
+import { downloads } from "../../data/downloadsData.js";
 
 // method renders songs on the screen when a playlist is clicked
 export function renderSongs() {

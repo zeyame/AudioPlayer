@@ -1,8 +1,4 @@
-import { downloads, addFileToDownloads } from "../../data/downloads.js";
-// import { updateDatabase } from "./dataHandling.js";
-
-// updateDatabase();
-
+import { addFileToDownloads, updateDownloadsPlaylist } from "../../data/downloads.js";
 
 // function handles the click on the download button
 function handleDownloadButton() {
@@ -27,7 +23,7 @@ function handleFileSelection() {
             if (event.target.files[0]) {
                 const selectedFile = event.target.files[0];
                 addFileToDownloads(selectedFile);       // adds the new file to downloads, saves to storage, updates database
-                // console.log(downloads);
+                updateDownloadsPlaylist();              // reflect changes onto downloads in the playlists array
             }
         });
     }

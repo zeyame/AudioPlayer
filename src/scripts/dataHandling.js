@@ -1,4 +1,4 @@
-import { downloads } from "../../data/downloads.js";
+import { downloads } from "../../data/downloadsData.js";
 
 export function updateDatabase() {
 

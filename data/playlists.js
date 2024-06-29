@@ -1,4 +1,4 @@
-import { downloads } from "./downloads.js";
+import { downloads } from "./downloadsData.js";
 
 // unique id for every playlist added
 let playlist_id = JSON.parse(localStorage.getItem('playlist_id')) || 1;
@@ -35,8 +35,7 @@ export function addPlaylist(playlistName, songsArray) {
             name: playlistName,
             songs: songsArray
         });
-        savePlaylist();
-        console.log(playlists);
+        savePlaylists();
     }   
 }
 
@@ -51,12 +50,12 @@ export function addSong(playlistName, songObject) {
                 title: songObject.title,
                 file: songObject.file
             });
-            savePlaylist();
+            savePlaylists();
         }
     }
 }
 
-function savePlaylist() {
+export function savePlaylists() {
     localStorage.setItem('playlists', JSON.stringify(playlists));
 }
 
