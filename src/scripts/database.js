@@ -128,3 +128,40 @@ export async function getSongFileDB(songId) {
 
 }
 
+
+export function removeSongFromDB(songId) {
+
+    const indexedDB = window.indexedDB;
+    const request = indexedDB.open('SongsDB', 1);
+    
+    request.onerror = (error) => {
+        console.error('Failed to open SongsDB to remove a song.', error);
+    }
+
+    request.onsuccess = (event) => {
+        const db = event.target.result;
+        const transaction = db.transaction('songs', 'readwrite');
+
+        transaction.onerror = (error) => {
+            console.error('Transaction to remove song with id', songId, 'from SongsDB failed', error);
+        }
+
+        transaction.oncomplete = () => {
+            console.log('Transaction to remove song with id', songId, 'from SongsDB was completed.');
+        }
+
+        const store = transaction.objectStore('songs');
+
+        const deleteRequest = store.delete(songId);
+    
+        deleteRequest.onerror = (error) => {
+            console.error('Unexpected error occurred when requesting to delete song with id', songId, 'from SongsDB', error);
+        }
+
+        deleteRequest.onsuccess = () => {
+            console.log(deleteRequest);
+            console.log('Song with id', songId, 'has been successfuly deleted from the database');
+        }
+    }
+
+}

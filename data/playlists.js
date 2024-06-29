@@ -33,6 +33,11 @@ export function removePlaylist(playlistId) {
     savePlaylists();
 }
 
+export function removeSongFromPlaylist(playlistId, songId) {
+    const playlist = getPlaylistById(playlistId);
+    playlist.songs = playlist.songs.filter(song => song.id != songId);
+}
+
 export function addPlaylist(playlistName, songsArray) {
     if (!isPlaylist(playlistName)) {
         playlists.push({

@@ -1,24 +1,22 @@
-import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist } from "../../data/playlists.js";
-import { getSongFileDB, updateDatabase } from "./database.js";
-import { renderURL } from "../../data/downloads.js";
+import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist } from "../../data/playlists.js";
+import { getSongFileDB, removeSongFromDB, updateDatabase } from "./database.js";
+import { removeSongFromDownloads, renderURL, updateDownloadsPlaylist } from "../../data/downloads.js";
 import { downloads } from "../../data/downloadsData.js";
 
 // method renders songs on the screen when a playlist is clicked
 export function renderSongs() {
     const playlistButtons = document.querySelectorAll('.js-playlist-button');       // all playlists on the screen
-    
+
     playlistButtons.forEach((button) => {
         button.addEventListener('click', async () => {
             const playlistId = Number(button.dataset.playlistId);
             document.body.innerHTML = await displaySongs(playlistId);        // displays the songs of the clicked playlist
+            handleDeleteSongBtn();
 
             // if the playlist clicked was not downloads playlist
             if (playlistId !== 1) {
                 handleAddSongBtn();
-                // console.log(playlists[0].songs);
-                // console.log(playlists[1].songs);
             }
-            // console.log(downloads);
         });
     });
 }
@@ -51,7 +49,7 @@ async function displaySongs(playlistId) {
         await processSongs(playlist);
         playlist.songs.forEach((song, index) => {
             songsHTML += `
-                <div class="flex items-center w-full py-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer song-row" data-song-id="${song.id}">
+                <div class="flex items-center w-full mt-4 py-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer song-row" data-song-id="${song.id}">
                     <button class="play-pause-btn mr-4 focus:outline-none" data-index="${index}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
@@ -63,6 +61,11 @@ async function displaySongs(playlistId) {
                         <p class="text-sm text-gray-500">${song.duration}</p>
                     </div>
                     <audio class="hidden" src="${song.url}"></audio>
+                    <button id="js-delete-song-${song.id}" class="text-gray-500 hover:text-red-500 transition-colors duration-200 js-delete-song-btn" data-song-id="${song.id}" data-playlist-id="${playlist.id}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </button>
                 </div>
             `;
         });
@@ -252,5 +255,48 @@ async function getSelectedSongs() {
 
     // this return value will also be wrapped in a promise since this is an async function
     return selectedSongs.filter(selectedSong => selectedSong !== null);     // extra check for assurance before returning
+}
+
+function handleDeleteSongBtn() {
+
+    const deleteSongButtons = document.querySelectorAll('.js-delete-song-btn');
+
+    deleteSongButtons.forEach((deleteSongBtn) => {
+        deleteSongBtn.addEventListener('click', async () => {
+
+            console.log('click');
+            const songId = Number(deleteSongBtn.dataset.songId);
+            const playlistId = Number(deleteSongBtn.dataset.playlistId);
+
+            // if song is being removed from the downloads
+            if (playlistId === 1) {
+                try {
+                    
+                    // remove song from downloads array and updating the downloads playlist to reflect changes
+                    removeSongFromDownloads(songId);
+                    updateDownloadsPlaylist();
+
+                    // removing the song from the database
+                    removeSongFromDB(songId);
+
+
+                    console.log(downloads);
+                    console.log(getPlaylistById(1).songs);
+                }
+                catch (error) {
+                    console.error("Error unexpectedly thrown when removing song with id", songId, 'from SongsDB', error);
+                }
+            }
+
+            else {
+                // remove song from the playlist but do not change the downloads array or SongsDB
+                removeSongFromPlaylist(playlistId, songId);
+            }
+
+            document.body.innerHTML = await displaySongs(playlistId);
+            handleDeleteSongBtn();
+        }
+    )});
+
 }
 

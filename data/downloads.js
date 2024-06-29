@@ -24,6 +24,7 @@ export function addFileToDownloads(file) {
         });
         saveToStorage();
         updateDatabase();
+        console.log(downloads);
 
         // display successful download message for 3 seconds
         displayDownloadMessage(file.name, true);
@@ -59,7 +60,18 @@ export function updateDownloadsPlaylist() {
     const downloadsPlaylist = getPlaylistById(1);
     
     if (downloadsPlaylist) {
-        downloadsPlaylist.songs = [...downloads];
+        downloadsPlaylist.songs = [...downloads];       // copying values of downloads array to the songs array of the downloads playlist
         savePlaylists();
     }
+}
+
+
+export function removeSongFromDownloads(songId) {
+    for (let i = 0; i < downloads.length; i++) {
+        if (downloads[i].id === songId) {
+            downloads.splice(i, 1);
+            break;
+        }
+    }
+    saveToStorage();
 }
