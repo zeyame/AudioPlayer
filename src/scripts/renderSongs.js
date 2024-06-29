@@ -1,4 +1,4 @@
-import { getPlaylist, playlists, addSong } from "../../data/playlists.js";
+import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist } from "../../data/playlists.js";
 import { getSongFileDB, updateDatabase } from "./dataHandling.js";
 import { downloads, renderURL } from "../../data/downloads.js";
 import { renderPlaylists } from "./renderPlaylists.js";
@@ -78,7 +78,7 @@ async function displaySongs(playlistId) {
     if (playlist.name !== 'Downloads') {
         songsHTML += `
             <div class="flex justify-center items-center py-4 mb-20">
-                <button id="js-add-song-button" class="bg-black text-white px-3 py-2 rounded-lg">Add Song</button>
+                <button id="js-add-song-button" class="bg-black text-white px-3 py-2 rounded-lg" data-playlist-id="${playlistId}">Add Song</button>
             </div>
         `;
     }
@@ -139,7 +139,8 @@ function handleAddSongBtn() {
         `;
 
         // add to the form all the downloaded songs that can be added to playlist
-        populateSongs();
+        const playlistId = Number(addSongBtn.dataset.playlistId);
+        populateSongs(playlistId);
 
         // adds click event listeners to the exit and add new song buttons
         handlePopUpButtons();
@@ -150,52 +151,60 @@ function handleAddSongBtn() {
     });
 }
 
-function populateSongs() {
+function populateSongs(playlistId) {
     // retrieve the form which will contain all downloaded songs
     const songListForm = document.getElementById('js-add-songs-form');
-
+    const playlist = getPlaylistById(playlistId);
+    
     // add all the downloaded songs as options to the form
     downloads.forEach((song) => {
-        // create a container div for every song
-        const songItem = document.createElement('div');
-        songItem.className = 'song-item flex items-center mb-0';
-        songItem.innerHTML = `
-            <input type="checkbox" id="${song.id}" name="song-${song.id}" value="${song.id}" class="js-song-option mr-2">
-            <label for="${song.id}">${song.title}</label>
-        `;
-        songListForm.appendChild(songItem);
+        if (!isSongInPlaylist(playlist, song.title)) {
+            // create a container div for every downloaded song not already added to the custom playlist
+            const songItem = document.createElement('div');
+            songItem.className = 'song-item flex items-center mb-0';
+            songItem.innerHTML = `
+                <input type="checkbox" id="${song.id}" name="song-${song.id}" value="${song.id}" class="js-song-option mr-2">
+                <label for="${song.id}">${song.title}</label>
+            `;
+            songListForm.appendChild(songItem);
+        }
     });
 }
 
 function handlePopUpButtons() {
     const addSongsModal = document.getElementById('js-add-songs-modal');
     const exitButton = document.getElementById('js-exit-add-songs-popup');
-    const addSongBtn = document.getElementById('js-add-new-song-button');
+    const addNewSongBtn = document.getElementById('js-add-new-song-button');
 
     exitButton.addEventListener('click', () => {
         addSongsModal.classList.add('hidden');
         addSongsModal.classList.remove('flex');
     });
 
-    addSongBtn.addEventListener('click', async () => {
+    addNewSongBtn.addEventListener('click', async () => {
 
         // try-catch as getSelectedSongs might throw unexpected error
         try {
             const selectedSongs = await getSelectedSongs();
+            // console.log("The selected songs:", selectedSongs);
             const playlistName = document.getElementById('js-playlist-name-header').innerText;
             const playlist = getPlaylist(playlistName);
 
             if (selectedSongs.length > 0) {
                 selectedSongs.forEach((songObject) => {
-                    addSong(playlist.name, songObject);
+                    addSong(playlistName, songObject);
                 });
             }
+            // console.log('Playlist after selected songs have been added', playlist.songs);
     
             addSongsModal.classList.add('hidden');
             addSongsModal.classList.remove('flex');
 
             // render the newly added songs to playlist
             document.body.innerHTML = await displaySongs(playlist.id);
+
+            // make sure add song button works without having to refresh page 
+            handleAddSongBtn();
 
         }
         catch (error) {

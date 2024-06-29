@@ -20,18 +20,24 @@ export function getPlaylist(playlistName) {
     return playlists.find(playlist => playlist.name === playlistName);
 }
 
-function isSongInPlaylist(playlist, songName) {
-    return playlist.songs.some(song => song.name === songName);
+export function getPlaylistById(playlistId) {
+    return playlists.find(playlist => playlist.id === playlistId);
+}
+
+export function isSongInPlaylist(playlist, songName) {
+    return playlist.songs.some(song => song.title === songName);
 }
 
 export function addPlaylist(playlistName, songsArray) {
-    playlists.push({
-        id: nextId(),
-        name: playlistName,
-        songs: songsArray
-    });
-    savePlaylist();
-    console.log(playlists);
+    if (!isPlaylist(playlistName)) {
+        playlists.push({
+            id: nextId(),
+            name: playlistName,
+            songs: songsArray
+        });
+        savePlaylist();
+        console.log(playlists);
+    }   
 }
 
 export function addSong(playlistName, songObject) {
