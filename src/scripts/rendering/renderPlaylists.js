@@ -1,4 +1,5 @@
-import { playlists, removePlaylist } from "../../data/playlists.js";
+import { playlists, removePlaylist } from "../../../data/playlists.js";
+import { renderSongs } from "./renderSongs.js";
 
 export function renderPlaylists() {
     const playlistsContainer = document.getElementById('js-playlists-container');
@@ -26,6 +27,10 @@ export function renderPlaylists() {
     playlistsHTML += '</div>';
     playlistsContainer.innerHTML = playlistsHTML;
 
+    // add click listeners for the render playlists
+    renderSongs();
+
+    // add click listeners for the delete playlist buttons
     handleDeletePlaylist();
 }
 
@@ -36,6 +41,8 @@ function handleDeletePlaylist() {
         deleteBtn.addEventListener('click', () => {
             const playlistId = Number(deleteBtn.dataset.playlistId);
             removePlaylist(playlistId);
+
+            // update the playlists on the page
             renderPlaylists();
         });
     });

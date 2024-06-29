@@ -1,7 +1,7 @@
-import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist } from "../../data/playlists.js";
-import { getSongFileDB, removeSongFromDB, updateDatabase } from "./database.js";
-import { removeSongFromDownloads, renderURL, updateDownloadsPlaylist } from "../../data/downloads.js";
-import { downloads } from "../../data/downloadsData.js";
+import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist } from "../../../data/playlists.js";
+import { getSongFileDB, removeSongFromDB, updateDatabase } from "../../../data/database.js";
+import { removeSongFromDownloads, renderURL, updateDownloadsPlaylist } from "../../../data/downloads.js";
+import { downloads } from "../../../data/downloadsData.js";
 
 // method renders songs on the screen when a playlist is clicked
 export function renderSongs() {
@@ -206,6 +206,9 @@ function handlePopUpButtons() {
 
                 // make sure add song button works without having to refresh page 
                 handleAddSongBtn();
+
+                // make sure the delete song buttons work without having to exit/refresh the page
+                handleDeleteSongBtn();
             }
 
             else {
@@ -294,6 +297,7 @@ function handleDeleteSongBtn() {
             }
 
             document.body.innerHTML = await displaySongs(playlistId);
+            handleAddSongBtn();
             handleDeleteSongBtn();
         }
     )});

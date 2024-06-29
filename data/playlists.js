@@ -29,13 +29,19 @@ export function isSongInPlaylist(playlist, songName) {
 }
 
 export function removePlaylist(playlistId) {
-    playlists.splice(playlistId-1, 1);
+    for (let i = 0; i < playlists.length; i++) {
+        if (playlists[i].id === playlistId) {
+            playlists.splice(i, 1);
+            break;
+        }
+    }
     savePlaylists();
 }
 
 export function removeSongFromPlaylist(playlistId, songId) {
     const playlist = getPlaylistById(playlistId);
     playlist.songs = playlist.songs.filter(song => song.id != songId);
+    savePlaylists();
 }
 
 export function addPlaylist(playlistName, songsArray) {
