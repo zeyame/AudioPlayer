@@ -1,4 +1,4 @@
-import { updateDatabase } from "../src/scripts/dataHandling.js";
+import { updateDatabase } from "../src/scripts/database.js";
 import { displayDownloadMessage, hideDownloadMessage } from "../src/scripts/home.js";
 import { getPlaylistById, savePlaylists } from "./playlists.js";
 import { downloads } from "./downloadsData.js";

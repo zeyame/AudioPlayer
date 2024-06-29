@@ -1,5 +1,5 @@
 import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist } from "../../data/playlists.js";
-import { getSongFileDB, updateDatabase } from "./dataHandling.js";
+import { getSongFileDB, updateDatabase } from "./database.js";
 import { renderURL } from "../../data/downloads.js";
 import { downloads } from "../../data/downloadsData.js";
 
