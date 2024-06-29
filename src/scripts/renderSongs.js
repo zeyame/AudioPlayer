@@ -6,7 +6,7 @@ import { downloads } from "../../data/downloadsData.js";
 // method renders songs on the screen when a playlist is clicked
 export function renderSongs() {
     const playlistButtons = document.querySelectorAll('.js-playlist-button');       // all playlists on the screen
-    console.log(playlistButtons);
+    
     playlistButtons.forEach((button) => {
         button.addEventListener('click', async () => {
             const playlistId = Number(button.dataset.playlistId);

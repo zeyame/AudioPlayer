@@ -28,6 +28,11 @@ export function isSongInPlaylist(playlist, songName) {
     return playlist.songs.some(song => song.title === songName);
 }
 
+export function removePlaylist(playlistId) {
+    playlists.splice(playlistId-1, 1);
+    savePlaylists();
+}
+
 export function addPlaylist(playlistName, songsArray) {
     if (!isPlaylist(playlistName)) {
         playlists.push({
