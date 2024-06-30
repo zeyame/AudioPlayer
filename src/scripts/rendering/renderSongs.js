@@ -1,4 +1,4 @@
-import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist, removeSongFromAllPlaylists, savePlaylists } from "../../../data/playlists.js";
+import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist, removeSongFromAllPlaylists, savePlaylists, getSongFromPlaylist } from "../../../data/playlists.js";
 import { getSongFileDB, removeSongFromDB } from "../../../data/database.js";
 import { removeSongFromDownloads, renderURL, saveToStorage, updateDownloadsPlaylist } from "../../../data/downloads.js";
 import { downloads } from "../../../data/downloadsData.js";
@@ -14,10 +14,11 @@ export function renderSongs() {
             handlePlayPauseBtn();
             handleDeleteSongBtn();
 
-            // if songs exist in a playlist we handle progress bars
+            // if songs exist in a playlist we handle progress bars and retrieve latest progress for each bar
             const playlist = getPlaylistById(playlistId);
             if (playlist.songs) {
                 handleProgressBarClicks();
+                loadProgressBarWidth();
             }
 
             // if the playlist clicked was not downloads playlist
@@ -73,7 +74,7 @@ async function displaySongs(playlistId) {
                     </div>
                     <audio id="js-audio-song-${song.id}" class="hidden js-audio-songs" data-playlist-name="${playlist.name}"data-song-id="${song.id}" src="${song.url}#t=${song.currentTime}" controls></audio>
                     <div class=" bg-gray-200 rounded-full h-2.5 overflow-hidden js-progress-bar-container" style="width: 300px">
-                        <div id="js-progress-bar-${song.id}" class="bg-black h-2.5 rounded-full transition-all js-progress-bar" data-song-id="${song.id}" style="width: 0%"></div>
+                        <div id="js-progress-bar-${song.id}" class="bg-black h-2.5 rounded-full transition-all js-progress-bar" data-playlist-name="${playlist.name}" data-song-id="${song.id}" style="width: 0%"></div>
                     </div>                    
                     <button id="js-delete-song-${song.id}" class="text-gray-500 hover:text-red-500 transition-colors duration-200 js-delete-song-btn ml-4" data-song-id="${song.id}" data-playlist-id="${playlist.id}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
@@ -223,6 +224,9 @@ function handlePopUpButtons() {
                 handlePlayPauseBtn();
                 handleDeleteSongBtn();
                 handleProgressBarClicks();
+
+                // retrieving latest progress for all songs
+                loadProgressBarWidth(); 
             }
 
             else {
@@ -359,6 +363,7 @@ function handleDeleteSongBtn() {
                     // re-adding the progress bar click listeners if there are any songs remaining
                     if (playlist.songs) {
                         handleProgressBarClicks();
+                        loadProgressBarWidth();
                     }
                 });
 
@@ -524,5 +529,60 @@ function handleProgressBarClicks() {
             }
             
         });
+    });
+}
+
+function loadProgressBarWidth() {
+    const progressBarContainers = document.querySelectorAll('.js-progress-bar-container');
+
+    // getting all progress bar containers and adjusting their progress bars' width
+    progressBarContainers.forEach((container) => {
+        // getting the progress bar div
+        const progressBar = container.querySelector('.js-progress-bar');
+
+        // getting the progress bar container width (currently set at 300px)
+        const containerWidth = Number(container.style.width.slice(0, -2));
+
+        // getting the song for this progress bar and the playlist it belongs to (remember: same songs in different playlists will have different current times)
+        const songId = Number(progressBar.dataset.songId);
+        const playlistName = progressBar.dataset.playlistName;
+        const playlist = getPlaylist(playlistName);
+        const song = getSongFromPlaylist(playlist, songId);
+
+        // retrieving the latest current time of the song object
+        const songCurrentTime = song ? song.currentTime: 0;
+
+        // getting the audio element associated with this song of the given playlist
+        const audio = Array.from(document.querySelectorAll('.js-audio-songs'))
+            .find(audio => audio.dataset.playlistName === playlistName && Number(audio.dataset.songId) === songId);
+
+        // if audio is found we wait for its metadata to be loaded if not already
+        if (audio) {
+            // if audio element was just created on the page, metadata is not instantly available and so we wait for it
+            audio.addEventListener('loadedmetadata', () => { 
+
+                // if the latest song current time was > 0 then we adjust the default progress bar width
+                if (songCurrentTime > 0) {
+                    const ratio = songCurrentTime/audio.duration;       // how far into the song we were
+                    const progress = containerWidth * ratio;        // calculating the new width in pixels
+                    progressBar.style.width = `${progress}px`;      // adjusting the default width of the progress bar
+                }
+            });
+
+            // if metatada of audio element was already loaded we do the same thing
+            if (audio.readyState >= 2) {
+                if (songCurrentTime > 0) {
+                    const ratio = songCurrentTime/audio.duration;
+                    const progress = containerWidth * ratio;
+                    progressBar.style.width = `${progress}px`;
+                }
+            }
+
+        }
+
+        else {
+            console.log("Audio element not found");
+        }
+
     });
 }
