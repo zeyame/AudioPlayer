@@ -66,6 +66,9 @@ async function displaySongs(playlistId) {
                         <p class="text-sm text-gray-500">${song.duration}</p>
                     </div>
                     <audio id="js-audio-song-${song.id}" class="hidden js-audio-songs" data-song-id="${song.id}" src="${song.url}" controls></audio>
+                    <div class="w-3/4 bg-gray-200 rounded-full h-2.5 overflow-hidden">
+                        <div id="js-progress-bar-${song.id}" class="bg-black h-2.5 rounded-full transition-all" style="width: 0%"></div>
+                    </div>                    
                     <button id="js-delete-song-${song.id}" class="text-gray-500 hover:text-red-500 transition-colors duration-200 js-delete-song-btn ml-4" data-song-id="${song.id}" data-playlist-id="${playlist.id}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -379,6 +382,7 @@ function handlePlayPauseBtn() {
                 if (audioElement.paused) {
                     pauseCurrentSong();
                     audioElement.play();
+                    updateProgressBar(audioElement);
                     button.querySelector('.js-play-icon').classList.add('hidden');
                     button.querySelector('.js-pause-icon').classList.remove('hidden');
                 }
@@ -414,5 +418,20 @@ function pauseCurrentSong() {
         playingSong.pause();
         playPauseBtn.querySelector('.js-pause-icon').classList.add('hidden');
         playPauseBtn.querySelector('.js-play-icon').classList.remove('hidden');
+    }
+}
+
+function updateProgressBar(audio) {
+    const songId = Number(audio.dataset.songId);
+    const progressBar = document.getElementById(`js-progress-bar-${songId}`);
+
+    audio.ontimeupdate = () => {
+        const songDuration = audio.duration;        // seconds
+        const currentTime = audio.currentTime;         // convert to seconds
+
+        if (songDuration > 0) {
+            const progress = (currentTime/songDuration) * 100           // %
+            progressBar.style.width = `${progress}%`;
+        }
     }
 }
