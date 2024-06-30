@@ -1,4 +1,4 @@
-import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist, removeSongFromAllPlaylists, getSongNameFromPlaylist } from "../../../data/playlists.js";
+import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist, removeSongFromAllPlaylists, getSongNameFromPlaylist, getSongFromPlaylistId, savePlaylists } from "../../../data/playlists.js";
 import { getSongFileDB, removeSongFromDB } from "../../../data/database.js";
 import { removeSongFromDownloads, renderURL, updateDownloadsPlaylist } from "../../../data/downloads.js";
 import { downloads } from "../../../data/downloadsData.js";
@@ -71,7 +71,7 @@ async function displaySongs(playlistId) {
                         <p class="text-lg font-semibold">${song.title}</p>
                         <p class="text-sm text-gray-500">${song.duration}</p>
                     </div>
-                    <audio id="js-audio-song-${song.id}" class="hidden js-audio-songs" data-song-id="${song.id}" src="${song.url}" controls></audio>
+                    <audio id="js-audio-song-${song.id}" class="hidden js-audio-songs" data-song-id="${song.id}" src="${song.url}#t=${song.currentTime}" controls></audio>
                     <div class=" bg-gray-200 rounded-full h-2.5 overflow-hidden js-progress-bar-container" style="width: 300px">
                         <div id="js-progress-bar-${song.id}" class="bg-black h-2.5 rounded-full transition-all js-progress-bar" data-song-id="${song.id}" style="width: 0%"></div>
                     </div>                    
@@ -385,7 +385,9 @@ function handlePlayPauseBtn() {
                 if (audioElement.paused) {
                     pauseCurrentSong();
                     audioElement.play();
-                    updateProgressBar(audioElement);            // progress bar increases with song time
+
+                    // increase progress bar and update song's current time property for persistence
+                    updateProgressBarAndSongTime(audioElement);    
 
                     // hiding the play icon and showing the pause icon
                     button.querySelector('.js-play-icon').classList.add('hidden');
@@ -432,16 +434,23 @@ function pauseCurrentSong() {
     }
 }
 
-function updateProgressBar(audio) {
+function updateProgressBarAndSongTime(audio) {
     const songId = Number(audio.dataset.songId);
+    const song = getSongFromPlaylistId(songId);
     const progressBar = document.getElementById(`js-progress-bar-${songId}`);
+    const songDuration = audio.duration;        // seconds
 
     // as long as current time of audio is changing, we adjust the progress bar accordingly
     audio.ontimeupdate = () => {
-        const songDuration = audio.duration;        // seconds
         const currentTime = audio.currentTime;         // seconds
 
-        if (songDuration > 0) {
+        if (song && songDuration > 0) {
+            // update current time of song
+            song.currentTime = currentTime;
+
+            savePlaylists();        // so that current time persists in storage
+
+            // update progress bar
             const progress = (currentTime/songDuration) * 100           // %
             progressBar.style.width = `${progress}%`;
         }
@@ -480,8 +489,8 @@ function handleProgressBarClicks() {
                 pauseCurrentSong();
                 audio.play();
 
-                // make sure progress bar is updating
-                updateProgressBar(audio);
+                // make sure progress bar and song's current time property are updating 
+                updateProgressBarAndSongTime(audio);
 
                 // hide play icon and show pause icon when audio plays
                 playPauseBtn.querySelector('.js-play-icon').classList.add('hidden');

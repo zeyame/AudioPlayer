@@ -20,6 +20,7 @@ export function addFileToDownloads(file) {
             {
             id: running_id,
             title: file.name,
+            currentTime: 0,         // seconds
             file: file
         });
         saveToStorage();

@@ -32,6 +32,18 @@ function getSongFromPlaylist(playlist, songId) {
     return playlist.songs.find(song => song.id === songId);
 }
 
+export function getSongFromPlaylistId(songId) {
+    let songFound;
+    for (const playist of playlists) {
+        playist.songs.forEach((song) => {
+            if (song.id === songId) {
+                songFound = song;
+            }
+        });
+    }
+    return songFound;
+}
+
 export function removePlaylist(playlistId) {
     for (let i = 0; i < playlists.length; i++) {
         if (playlists[i].id === playlistId) {
@@ -74,6 +86,7 @@ export function addSong(playlistName, songObject) {
             playlist.songs.push({
                 id: songObject.id,
                 title: songObject.title,
+                currentTime: 0,         // seconds
                 file: songObject.file
             });
             savePlaylists();
