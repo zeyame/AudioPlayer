@@ -1,6 +1,6 @@
-import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist, removeSongFromAllPlaylists, getSongNameFromPlaylist, getSongFromPlaylistId, savePlaylists } from "../../../data/playlists.js";
+import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist, removeSongFromAllPlaylists, savePlaylists } from "../../../data/playlists.js";
 import { getSongFileDB, removeSongFromDB } from "../../../data/database.js";
-import { removeSongFromDownloads, renderURL, updateDownloadsPlaylist } from "../../../data/downloads.js";
+import { removeSongFromDownloads, renderURL, saveToStorage, updateDownloadsPlaylist } from "../../../data/downloads.js";
 import { downloads } from "../../../data/downloadsData.js";
 
 // method renders songs on the screen when a playlist is clicked
@@ -71,7 +71,7 @@ async function displaySongs(playlistId) {
                         <p class="text-lg font-semibold">${song.title}</p>
                         <p class="text-sm text-gray-500">${song.duration}</p>
                     </div>
-                    <audio id="js-audio-song-${song.id}" class="hidden js-audio-songs" data-song-id="${song.id}" src="${song.url}#t=${song.currentTime}" controls></audio>
+                    <audio id="js-audio-song-${song.id}" class="hidden js-audio-songs" data-playlist-name="${playlist.name}"data-song-id="${song.id}" src="${song.url}#t=${song.currentTime}" controls></audio>
                     <div class=" bg-gray-200 rounded-full h-2.5 overflow-hidden js-progress-bar-container" style="width: 300px">
                         <div id="js-progress-bar-${song.id}" class="bg-black h-2.5 rounded-full transition-all js-progress-bar" data-song-id="${song.id}" style="width: 0%"></div>
                     </div>                    
@@ -435,23 +435,44 @@ function pauseCurrentSong() {
 }
 
 function updateProgressBarAndSongTime(audio) {
+    // get song from the playlist which its being played from
     const songId = Number(audio.dataset.songId);
-    const song = getSongFromPlaylistId(songId);
+    const playlist = getPlaylist(audio.dataset.playlistName);
+
+    // get progress bar to be adjusted
     const progressBar = document.getElementById(`js-progress-bar-${songId}`);
     const songDuration = audio.duration;        // seconds
 
     // as long as current time of audio is changing, we adjust the progress bar accordingly
     audio.ontimeupdate = () => {
-        const currentTime = audio.currentTime;         // seconds
+        if (songDuration > 0) {
 
-        if (song && songDuration > 0) {
-            // update current time of song
-            song.currentTime = currentTime;
+            // if song is being played from the downloads playlist, we update downloads array and then transfer the updates to playlists array
+            if (playlist.id === 1) {
+                // update current time of song in downloads
+                downloads.forEach((download) => {
+                    if (download.id === songId) {
+                        download.currentTime = audio.currentTime;
+                    }
+                });
+                saveToStorage();        // saving downloads to storage
 
-            savePlaylists();        // so that current time persists in storage
+                // update downloads playlist to reflect downloads array changes
+                updateDownloadsPlaylist();
+
+            }
+
+            else {
+                playlist.songs.forEach((song) => {
+                    if (song.id === songId) {
+                        song.currentTime = audio.currentTime;
+                    }
+                });
+                savePlaylists();
+            }
 
             // update progress bar
-            const progress = (currentTime/songDuration) * 100           // %
+            const progress = (audio.currentTime/songDuration) * 100           // %
             progressBar.style.width = `${progress}%`;
         }
     }

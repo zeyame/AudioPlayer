@@ -71,25 +71,24 @@ function insertDownloads(db) {
 
     transaction.oncomplete = () => {
         if (downloads) console.log('New song successfully loaded into SongsDB');  
-        printDatabase(db);
     }
 }
 
 // printing the database after every insertion
-function printDatabase(db) {
-    const transaction = db.transaction('songs', 'readonly');
-    const store = transaction.objectStore('songs');
+// function printDatabase(db) {
+//     const transaction = db.transaction('songs', 'readonly');
+//     const store = transaction.objectStore('songs');
 
-    const queryAll = store.getAll();
+//     const queryAll = store.getAll();
 
-    queryAll.onerror = (event) => {
-        console.log("Error in querying the entire SongsDB", event.target.error);
-    }
+//     queryAll.onerror = (event) => {
+//         console.log("Error in querying the entire SongsDB", event.target.error);
+//     }
 
-    queryAll.onsuccess = (event) => {
-        console.log('All the songs in the database:', event.target.result);
-    }
-}
+//     queryAll.onsuccess = (event) => {
+//         console.log('All the songs in the database:', event.target.result);
+//     }
+// }
 
 
 // function fetches the file of a specific song stored in the database

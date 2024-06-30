@@ -47,7 +47,7 @@ export function addFileToDownloads(file) {
 }
 
 // saves downloads array
-function saveToStorage() {
+export function saveToStorage() {
     localStorage.setItem('downloads', JSON.stringify(downloads));
 }
 
