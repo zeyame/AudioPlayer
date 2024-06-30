@@ -11,6 +11,7 @@ export function renderSongs() {
         button.addEventListener('click', async () => {
             const playlistId = Number(button.dataset.playlistId);
             document.body.innerHTML = await displaySongs(playlistId);        // displays the songs of the clicked playlist
+            handlePlayPauseBtn();
             handleDeleteSongBtn();
 
             // if the playlist clicked was not downloads playlist
@@ -50,18 +51,21 @@ async function displaySongs(playlistId) {
         playlist.songs.forEach((song, index) => {
             songsHTML += `
                 <div class="flex items-center w-full mt-4 py-4 border-b border-gray-200 hover:bg-gray-100 cursor-pointer song-row" data-song-id="${song.id}">
-                    <button class="play-pause-btn mr-4 focus:outline-none" data-index="${index}">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <button class="play-pause-btn js-play-pause-btn mr-4 focus:outline-none" data-song-id="${song.id}" data-index="${index}">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 play-icon js-play-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pause-icon js-pause-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
                     </button>
                     <div class="flex-grow">
                         <p class="text-lg font-semibold">${song.title}</p>
                         <p class="text-sm text-gray-500">${song.duration}</p>
                     </div>
-                    <audio class="hidden" src="${song.url}"></audio>
-                    <button id="js-delete-song-${song.id}" class="text-gray-500 hover:text-red-500 transition-colors duration-200 js-delete-song-btn" data-song-id="${song.id}" data-playlist-id="${playlist.id}">
+                    <audio id="js-audio-song-${song.id}" class="hidden" src="${song.url}" controls></audio>
+                    <button id="js-delete-song-${song.id}" class="text-gray-500 hover:text-red-500 transition-colors duration-200 js-delete-song-btn ml-4" data-song-id="${song.id}" data-playlist-id="${playlist.id}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
                         </svg>
@@ -204,10 +208,9 @@ function handlePopUpButtons() {
                 // render the newly added songs to playlist
                 document.body.innerHTML = await displaySongs(playlist.id);
 
-                // make sure add song button works without having to refresh page 
+                // re-adding event listeners for add song, delete song, play pause song buttons
                 handleAddSongBtn();
-
-                // make sure the delete song buttons work without having to exit/refresh the page
+                handlePlayPauseBtn();
                 handleDeleteSongBtn();
             }
 
@@ -300,10 +303,39 @@ function handleDeleteSongBtn() {
                 handleAddSongBtn();
             }
 
-            // adding the event listeners for the delete songs button
+            // re-adding the event listeners for the play/pause and delete songs buttons
+            handlePlayPauseBtn();
             handleDeleteSongBtn();
         }
     )});
 
 }
 
+
+function handlePlayPauseBtn() {
+    const playPauseBtns = document.querySelectorAll('.js-play-pause-btn');
+    playPauseBtns.forEach((button) => {
+        button.addEventListener('click', () => {
+            const songClicked = Number(button.dataset.songId);
+            const audioElement = document.getElementById(`js-audio-song-${songClicked}`);
+
+            if (audioElement) {
+                if (audioElement.paused) {
+                    audioElement.play();
+                    button.querySelector('.js-play-icon').classList.add('hidden');
+                    button.querySelector('.js-pause-icon').classList.remove('hidden');
+                }
+
+                else {
+                    audioElement.pause();
+                    button.querySelector('.js-play-icon').classList.remove('hidden');
+                    button.querySelector('.js-pause-icon').classList.add('hidden');
+                }
+            }
+
+            else {
+                console.log("Audio element for song with id", songClicked, "was not found.");
+            }
+        });
+    });
+}
