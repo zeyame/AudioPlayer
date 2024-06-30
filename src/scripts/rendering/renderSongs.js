@@ -1,4 +1,4 @@
-import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist } from "../../../data/playlists.js";
+import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist, removeSongFromAllPlaylists } from "../../../data/playlists.js";
 import { getSongFileDB, removeSongFromDB } from "../../../data/database.js";
 import { removeSongFromDownloads, renderURL, updateDownloadsPlaylist } from "../../../data/downloads.js";
 import { downloads } from "../../../data/downloadsData.js";
@@ -280,6 +280,9 @@ function handleDeleteSongBtn() {
                     // remove song from downloads array and updating the downloads playlist to reflect changes
                     removeSongFromDownloads(songId);
                     updateDownloadsPlaylist();
+
+                    // removing the song from all playlists
+                    removeSongFromAllPlaylists(songId);
 
                     // removing the song from the database
                     removeSongFromDB(songId);

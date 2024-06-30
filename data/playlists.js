@@ -38,6 +38,12 @@ export function removePlaylist(playlistId) {
     savePlaylists();
 }
 
+export function removeSongFromAllPlaylists(songId) {
+    for (const playlist of playlists) {
+        removeSongFromPlaylist(playlist.id, songId);
+    }
+}
+
 export function removeSongFromPlaylist(playlistId, songId) {
     const playlist = getPlaylistById(playlistId);
     playlist.songs = playlist.songs.filter(song => song.id != songId);
