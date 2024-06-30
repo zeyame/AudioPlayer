@@ -64,7 +64,7 @@ async function displaySongs(playlistId) {
                         <p class="text-lg font-semibold">${song.title}</p>
                         <p class="text-sm text-gray-500">${song.duration}</p>
                     </div>
-                    <audio id="js-audio-song-${song.id}" class="hidden js-audio-songs" src="${song.url}" controls></audio>
+                    <audio id="js-audio-song-${song.id}" class="hidden js-audio-songs" data-song-id="${song.id}" src="${song.url}" controls></audio>
                     <button id="js-delete-song-${song.id}" class="text-gray-500 hover:text-red-500 transition-colors duration-200 js-delete-song-btn ml-4" data-song-id="${song.id}" data-playlist-id="${playlist.id}">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
@@ -320,13 +320,15 @@ function handlePlayPauseBtn() {
             const audioElement = document.getElementById(`js-audio-song-${songClicked}`);
 
             if (audioElement) {
-                // we only play the song if no other song is playing and the song is currently paused
-                if (!audioPlaying() && audioElement.paused) {
+                // we only play the song after pausing any song that is currently playing
+                if (audioElement.paused) {
+                    pauseCurrentSong();
                     audioElement.play();
                     button.querySelector('.js-play-icon').classList.add('hidden');
                     button.querySelector('.js-pause-icon').classList.remove('hidden');
                 }
 
+                // if clicked song is already playing, we pause it
                 else {
                     audioElement.pause();
                     button.querySelector('.js-play-icon').classList.remove('hidden');
@@ -341,9 +343,21 @@ function handlePlayPauseBtn() {
     });
 }
 
-function audioPlaying() {
+function pauseCurrentSong() {
     const audioElements = document.querySelectorAll('.js-audio-songs');
-    const audioArray = Array.from(audioElements);
 
-    return audioArray.some(audio => audio.currentTime > 0 && !audio.paused);
+    const playingSong = Array.from(audioElements)
+        .find(audio => audio.currentTime > 0 && !audio.paused);
+    
+    const playingSongId = playingSong ? playingSong.dataset.songId : '';
+    
+    const playPauseBtn = Array.from(document.querySelectorAll('.js-play-pause-btn'))
+        .find(button => button.dataset.songId === playingSongId);
+
+
+    if (playPauseBtn) {
+        playingSong.pause();
+        playPauseBtn.querySelector('.js-pause-icon').classList.add('hidden');
+        playPauseBtn.querySelector('.js-play-icon').classList.remove('hidden');
+    }
 }
