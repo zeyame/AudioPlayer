@@ -1,4 +1,4 @@
-import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist, removeSongFromAllPlaylists } from "../../../data/playlists.js";
+import { getPlaylist, playlists, addSong, getPlaylistById, isSongInPlaylist, removeSongFromPlaylist, removeSongFromAllPlaylists, getSongNameFromPlaylist } from "../../../data/playlists.js";
 import { getSongFileDB, removeSongFromDB } from "../../../data/database.js";
 import { removeSongFromDownloads, renderURL, updateDownloadsPlaylist } from "../../../data/downloads.js";
 import { downloads } from "../../../data/downloadsData.js";
@@ -42,6 +42,7 @@ async function displaySongs(playlistId) {
                 </button>
             </header>
             <div id="js-add-songs-modal" class="fixed inset-0 hidden z-50 overflow-auto modal-backdrop"></div>
+            <div id="js-delete-song-modal" class="fixed inset-0 hidden z-50 overflow-auto modal-backdrop"></div>
             <div class="flex-grow overflow-y-auto">
                 <div id="js-songs-container" class="flex flex-col w-2/3 mx-auto">
     `;
@@ -266,54 +267,105 @@ async function getSelectedSongs() {
 function handleDeleteSongBtn() {
 
     const deleteSongButtons = document.querySelectorAll('.js-delete-song-btn');
+    const deleteSongModal = document.getElementById('js-delete-song-modal');
 
     deleteSongButtons.forEach((deleteSongBtn) => {
         deleteSongBtn.addEventListener('click', async () => {
+            deleteSongModal.innerHTML = `
+                <div class="modal-content relative p-8 bg-white m-auto flex-col flex rounded-lg">
+                    <div id="js-delete-song-popup" class="flex flex-col items-center justify-center h-full">
+                        <button id="js-exit-delete-song-popup" class="absolute top-6 right-8 text-gray-500 hover:text-gray-900">
+                            <span class="font-bold text-lg">X</span>
+                        </button>
+                        <h2 class="text-xl font-bold mb-4">Delete Song</h2>
+                        <div id="delete-song-options-container" class="mt-3">
+                            <button id="js-confirm-delete-button" class="bg-black text-white mr-2 px-4 py-2 rounded">
+                                Confirm
+                            </button><button id="js-cancel-delete-button" class="bg-black text-white px-4 py-2 rounded">
+                                Cancel
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
 
+            deleteSongModal.classList.remove('hidden');
+            deleteSongModal.classList.add('flex');
+
+            // handling click listeners
             const songId = Number(deleteSongBtn.dataset.songId);
             const playlistId = Number(deleteSongBtn.dataset.playlistId);
+            
 
-            // if song is being removed from the downloads
-            if (playlistId === 1) {
-                try {
+            // exit button
+            document.getElementById('js-exit-delete-song-popup')
+                .addEventListener(('click'), async () => {
+
+                    // hiding the modal
+                    deleteSongModal.classList.add('hidden');
+                    deleteSongModal.classList.remove('flex');
+
+                    // // rendering updating songs list for the playlist
+                    // document.body.innerHTML = await displaySongs(playlistId);
                     
-                    // remove song from downloads array and updating the downloads playlist to reflect changes
-                    removeSongFromDownloads(songId);
-                    updateDownloadsPlaylist();
+                    // // re-adding the listeners after document's html was regenerated
+                    // if (playlistId !== 1) handleAddSongBtn();
+                    // handlePlayPauseBtn();
+                    // handleDeleteSongBtn();
+                });
 
-                    // removing the song from all playlists
-                    removeSongFromAllPlaylists(songId);
+            
+            // confirm button
+            document.getElementById('js-confirm-delete-button')
+                .addEventListener('click', async () => {
+                    // if removing the song from downloads playlist
+                    if (playlistId === 1) {
+                        try {
+                            
+                            // remove song from downloads array and updating the downloads playlist to reflect changes
+                            removeSongFromDownloads(songId);
+                            updateDownloadsPlaylist();
+        
+                            // removing the song from all playlists
+                            removeSongFromAllPlaylists(songId);
+        
+                            // removing the song from the database
+                            removeSongFromDB(songId);
+        
+                            // regenerating html for the updating song list of the playlist
+                            document.body.innerHTML = await displaySongs(playlistId);
+                        }
+                        catch (error) {
+                            console.error("Error unexpectedly thrown when removing song with id", songId, 'from SongsDB', error);
+                        }
+                    }
 
-                    // removing the song from the database
-                    removeSongFromDB(songId);
+                    // if removing the song from any other playlist
+                    else {
+                        // remove song from the playlist but do not change the downloads array or SongsDB
+                        removeSongFromPlaylist(playlistId, songId);
 
-                    // regenerating html for the updating song list of the playlist
-                    document.body.innerHTML = await displaySongs(playlistId);
-                }
-                catch (error) {
-                    console.error("Error unexpectedly thrown when removing song with id", songId, 'from SongsDB', error);
-                }
-            }
+                        // regenerating html for the updating song list of the playlist
+                        document.body.innerHTML = await displaySongs(playlistId);
 
-            else {
-                // remove song from the playlist but do not change the downloads array or SongsDB
-                removeSongFromPlaylist(playlistId, songId);
+                        // adding the event listener for the add song button
+                        handleAddSongBtn();
+                    }
 
-                // regenerating html for the updating song list of the playlist
-                document.body.innerHTML = await displaySongs(playlistId);
+                    // re-adding the event listeners for the play/pause and delete songs buttons
+                    handlePlayPauseBtn();
+                    handleDeleteSongBtn();
+                });
 
-                // adding the event listener for the add song button
-                handleAddSongBtn();
-            }
-
-            // re-adding the event listeners for the play/pause and delete songs buttons
-            handlePlayPauseBtn();
-            handleDeleteSongBtn();
-        }
-    )});
-
+            
+            // cancel button
+            document.getElementById('js-cancel-delete-button')
+                .addEventListener('click', () => {
+                    // hiding the modal
+                    deleteSongModal.classList.add('hidden');
+                    deleteSongModal.classList.remove('flex');
+                });
+    })});
 }
-
 
 function handlePlayPauseBtn() {
     const playPauseBtns = document.querySelectorAll('.js-play-pause-btn');

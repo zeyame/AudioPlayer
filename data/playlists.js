@@ -28,6 +28,10 @@ export function isSongInPlaylist(playlist, songName) {
     return playlist.songs.some(song => song.title === songName);
 }
 
+function getSongFromPlaylist(playlist, songId) {
+    return playlist.songs.find(song => song.id === songId);
+}
+
 export function removePlaylist(playlistId) {
     for (let i = 0; i < playlists.length; i++) {
         if (playlists[i].id === playlistId) {
@@ -75,6 +79,18 @@ export function addSong(playlistName, songObject) {
             savePlaylists();
         }
     }
+}
+
+export function getSongNameFromPlaylist(songId, playlistId) {
+    const playist = getPlaylistById(playlistId);
+
+    if (playist) {
+        const song = getSongFromPlaylist(playist, songId);
+        if (song) {
+            return song.title;
+        }
+    }
+    return null;
 }
 
 export function savePlaylists() {
