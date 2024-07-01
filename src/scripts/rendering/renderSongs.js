@@ -23,7 +23,7 @@ export function renderSongs() {
                 calculateDurations();
             }
 
-            // if the playlist clicked was not downloads playlist
+            // if the playlist clicked was not downloads playlist 
             if (playlistId !== 1) {
                 handleAddSongBtn();
             }
@@ -221,14 +221,13 @@ function handlePopUpButtons() {
                 // render the newly added songs to playlist
                 document.body.innerHTML = await displaySongs(playlist.id);
 
-                // re-adding event listeners for add song, delete song, play/pause song and progress bar buttons
+                // re-adding all functionality to the page
                 handleAddSongBtn();
                 handlePlayPauseBtn();
                 handleDeleteSongBtn();
                 handleProgressBarClicks();
-
-                // retrieving latest progress for all songs
                 loadProgressBarWidth(); 
+                calculateDurations();
             }
 
             else {
@@ -354,18 +353,20 @@ function handleDeleteSongBtn() {
                         // regenerating html for the updating song list of the playlist
                         document.body.innerHTML = await displaySongs(playlistId);
 
-                        // adding the event listener for the add song button
-                        handleAddSongBtn();
-                    }
+                        // if playlist still has songs and is not the downloads playlist
+                        if (playlist.songs) {
+                            // adding the event listener for the add song button
+                            handleAddSongBtn();
+                        }
+                    }                    
 
-                    // re-adding the event listeners for the play/pause and delete songs buttons
-                    handlePlayPauseBtn();
-                    handleDeleteSongBtn();
-
-                    // re-adding the progress bar click listeners if there are any songs remaining
+                    // re-adding the event handlers for all buttons on the screen
                     if (playlist.songs) {
+                        handlePlayPauseBtn();
+                        handleDeleteSongBtn();
                         handleProgressBarClicks();
                         loadProgressBarWidth();
+                        calculateDurations();
                     }
                 });
 
@@ -481,6 +482,18 @@ function updateProgressBarAndSongTime(audio) {
             // update progress bar
             const progress = (audio.currentTime/songDuration) * 100           // %
             progressBar.style.width = `${progress}%`;
+
+            // updating running time of the song playing on the screen
+            document.querySelectorAll('.js-song-duration').forEach(((duration) => {
+                if (Number(duration.dataset.songId) === songId) {
+                    const song = getSongFromPlaylist(playlist, songId);
+                    if (!song) {
+                        console.error("Could not find song with id", songId, 'from', playlist.name, 'to update the running time');
+                        return;
+                    }
+                    duration.innerText = `${formatTime(song.currentTime)}/${formatTime(audio.duration)}`;
+                }
+            }));
         }
     }
 }
@@ -636,4 +649,4 @@ function formatTime(seconds) {
     const secs = duration.seconds().toString().padStart(2, '0');
   
     return hours > 0 ? `${hours}:${minutes}:${secs}` : `${minutes}:${secs}`;
-  }
+}
