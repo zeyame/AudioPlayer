@@ -11,14 +11,16 @@ export function renderSongs() {
         button.addEventListener('click', async () => {
             const playlistId = Number(button.dataset.playlistId);
             document.body.innerHTML = await displaySongs(playlistId);        // displays the songs of the clicked playlist
-            handlePlayPauseBtn();
-            handleDeleteSongBtn();
+            
 
-            // if songs exist in a playlist we handle progress bars and retrieve latest progress for each bar
+            // if songs exist in a playlist we add all the event listeners and calculate song durations
             const playlist = getPlaylistById(playlistId);
             if (playlist.songs) {
+                handlePlayPauseBtn();
+                handleDeleteSongBtn();
                 handleProgressBarClicks();
                 loadProgressBarWidth();
+                calculateDurations();
             }
 
             // if the playlist clicked was not downloads playlist
@@ -70,7 +72,7 @@ async function displaySongs(playlistId) {
                     </button>
                     <div class="flex-grow">
                         <p class="text-lg font-semibold">${song.title}</p>
-                        <p class="text-sm text-gray-500">${song.duration}</p>
+                        <p id="js-song-duration-${song.id}" class="js-song-duration text-sm text-gray-500" data-playlist-name="${playlist.name}" data-song-id="${song.id}"></p>
                     </div>
                     <audio id="js-audio-song-${song.id}" class="hidden js-audio-songs" data-playlist-name="${playlist.name}"data-song-id="${song.id}" src="${song.url}#t=${song.currentTime}" controls></audio>
                     <div class=" bg-gray-200 rounded-full h-2.5 overflow-hidden js-progress-bar-container" style="width: 300px">
@@ -586,3 +588,52 @@ function loadProgressBarWidth() {
 
     });
 }
+
+
+function calculateDurations() {
+    // get all duration paragraph elements on the page
+    const durations = document.querySelectorAll('.js-song-duration');
+
+    durations.forEach((duration) => {
+        // we get the song id associated with the duration element
+        const songId = Number(duration.dataset.songId);
+        
+        // we get the song object associated with the duration element
+        const playlistName = duration.dataset.playlistName;
+
+        const playlist = getPlaylist(playlistName);
+        const song = getSongFromPlaylist(playlist, songId);
+
+        // we get the audio file that matches the song 
+        const audio = Array.from(document.querySelectorAll('.js-audio-songs'))
+            .find(audio => Number(audio.dataset.songId) === songId);
+        
+        if (audio) {
+            // if audio element's metadata has been loaded, we calculate the time to display in duration
+            audio.addEventListener('loadedmetadata', () => {
+                const formattedDuration = formatTime(audio.duration);
+
+                if (song.currentTime > 0) {
+                    duration.innerText = `${formatTime(song.currentTime)}/${formattedDuration}`;
+                } else {
+                    duration.innerText = formattedDuration;
+                }
+            });
+
+            // metadata was already loaded from before
+            if (audio.readyState >= 1) {
+                const formattedDuration = formatTime(audio.duration);
+                duration.innerText = formattedDuration;
+            }
+        }
+    });
+}
+
+function formatTime(seconds) {
+    const duration = moment.duration(seconds, 'seconds');
+    const hours = Math.floor(duration.asHours());
+    const minutes = duration.minutes().toString().padStart(2, '0');
+    const secs = duration.seconds().toString().padStart(2, '0');
+  
+    return hours > 0 ? `${hours}:${minutes}:${secs}` : `${minutes}:${secs}`;
+  }
